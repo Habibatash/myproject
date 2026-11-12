@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+{% block title %}نوی حساب | {{ site_name }}{% endblock %}
+{% block public_content %}
+<div class="gate"><div class="gate-card">
+  <div class="gate-brand"><div class="brand-logo">ا</div><div><b>{{ site_name }}</b><small>نوی کارن ثبتول</small></div></div>
+  <h3>نوی حساب جوړول</h3>
+  <p class="muted tiny">لومړی خپل ایمیل تایید کړئ، بیا به د عمومي مدیر تایید ته انتظار وکړئ.</p>
+  {% if messages %}{% for m in messages %}<div class="flash {{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+  <form method="post">{% csrf_token %}
+    <div class="form-group"><label>بشپړ نوم</label><input name="name" required maxlength="150"></div>
+    <div class="form-group"><label>ایمیل</label><input name="email" type="email" required></div>
+    <div class="form-group"><label>امریت</label><select name="department" required><option value="">امریت وټاکئ</option>{% for d in departments %}<option value="{{ d.pk }}">{{ d.name }}</option>{% endfor %}</select></div>
+    <div class="form-group"><label>پټنوم (لږ تر لږه ۱۰ توري)</label><input name="password" type="password" required minlength="10"></div>
+    <div class="form-group"><label>پټنوم بیا ولیکئ</label><input name="confirm_password" type="password" required minlength="10"></div>
+    <div class="modal-actions"><button class="btn gold" type="submit">حساب ثبتول</button><a class="btn light" href="{% url 'login' %}">ننوتل</a></div>
+  </form>
+</div></div>
+{% endblock %}

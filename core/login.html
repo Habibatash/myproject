@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+{% block title %}ننوتل | {{ site_name }}{% endblock %}
+{% block public_content %}
+<div class="gate"><div class="gate-card">
+  <div class="gate-brand"><div class="brand-logo">ا</div><div><b>{{ site_name }}</b><small>د اسنادو او راپورونو مدیریت</small></div></div>
+  <h3>سیستم ته ننوتل</h3>
+  {% if messages %}{% for m in messages %}<div class="flash {{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+  <form method="post">{% csrf_token %}
+    <div class="form-group"><label for="id_username">ایمیل</label><input id="id_username" name="username" type="email" autocomplete="username" required autofocus></div>
+    <div class="form-group"><label for="id_password">پټنوم</label><input id="id_password" name="password" type="password" autocomplete="current-password" required></div>
+    <div class="modal-actions"><button class="btn gold" type="submit">ننوتل</button><a class="btn light" href="{% url 'register' %}">نوی حساب جوړول</a></div>
+  </form>
+  {% if unverified_email %}<form method="post" action="{% url 'resend_verification' %}" class="resend-form">{% csrf_token %}<input type="hidden" name="email" value="{{ unverified_email }}"><button class="btn light" type="submit">✉ د تایید لینک بیا ولېږه</button></form>{% endif %}
+</div></div>
+{% endblock %}
