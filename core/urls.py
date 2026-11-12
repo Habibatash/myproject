@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
@@ -21,4 +22,7 @@ urlpatterns = [
     path('settings/', views.settings_page, name='settings'),
     path('attachment/<int:pk>/download/', views.attachment_download, name='attachment_download'),
     path('message/<int:pk>/voice/', views.message_voice, name='message_voice'),
+    
+    # د لاګین سم مسیر د login.html فایل سره:
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
 ]
