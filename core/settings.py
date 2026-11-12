@@ -31,7 +31,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.UserTimezoneMiddleware',
 ]
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'core.urls'
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [BASE_DIR / 'templates'], 'APP_DIRS': True,
@@ -41,8 +41,8 @@ TEMPLATES = [{
         'core.context_processors.site_context',
     ]},
 }]
-WSGI_APPLICATION = 'config.wsgi.application'
-ASGI_APPLICATION = 'config.asgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
 if DATABASE_URL:
@@ -62,8 +62,8 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-LANGUAGE_CODE = 'ps'
-LANGUAGES = [('ps', 'پښتو'), ('fa', 'دری / فارسی'), ('ar', 'العربية'), ('en', 'English')]
+LANGUAGE_CODE = 'fa'
+LANGUAGES = [('fa', 'پښتو'), ('fa', 'دری / فارسی'), ('ar', 'العربية'), ('en', 'English')]
 TIME_ZONE = os.getenv('TIME_ZONE', 'Asia/Kabul')
 USE_I18N = True
 USE_TZ = True
