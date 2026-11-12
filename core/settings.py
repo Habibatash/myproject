@@ -11,7 +11,7 @@ def env_bool(name, default=False):
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'dev-only-change-this-before-deployment-8e0c79')
 DEBUG = env_bool('DEBUG', True)
-ALLOWED_HOSTS = [x.strip() for x in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if x.strip()]
+ALLOWED_HOSTS = ['*'] for x in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if x.strip()]
 CSRF_TRUSTED_ORIGINS = [x.strip() for x in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if x.strip()]
 
 INSTALLED_APPS = [
