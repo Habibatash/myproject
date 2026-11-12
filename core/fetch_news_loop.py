@@ -1,18 +1,17 @@
 import time
 from django.conf import settings
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from core.news_ingest import fetch_all
-
 
 class Command(BaseCommand):
-    help = "Continuously fetch public RSS/Atom news; supervise this process in production"
-
-    def handle(self, *args, **options):
-        minutes = max(5, int(getattr(settings, "NEWS_FETCH_INTERVAL_MIN", 15)))
-        self.stdout.write(self.style.SUCCESS(f"RSS collector running every {minutes} minutes"))
+    help = 'د RSS خبرونو راټولول په ټاکلي واټن تکراروي؛ په جلا service/terminal کې یې وچلوئ.'
+    def handle(self, *args, **opts):
+        interval = max(1, settings.NEWS_FETCH_INTERVAL_MIN) * 60
+        if not settings.NEWS_AUTOFETCH:
+            self.stdout.write('NEWS_AUTOFETCH بند دی؛ worker نه چلېږي.')
+            return
+        self.stdout.write(f'RSS worker فعال شو؛ هر {interval//60} دقیقې.')
         while True:
-            try:
-                self.stdout.write(str(fetch_all()))
-            except Exception as exc:  # noqa: BLE001
-                self.stderr.write(f"Collector iteration failed: {exc}")
-            time.sleep(minutes * 60)
+            try: call_command('fetch_news_once')
+            except Exception as exc: self.stderr.write(f'RSS worker error: {exc.__class__.__name__}: {exc}')
+            time.sleep(interval)

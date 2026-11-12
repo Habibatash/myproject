@@ -1,12 +1,21 @@
-from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('core.auth_urls')),
-    path('', include('core.urls')),
+    path('', views.dashboard, name='dashboard'),
+    path('documents/', views.documents, name='documents'),
+    path('reports/', views.reports, name='reports'),
+    path('departments/', views.departments, name='departments'),
+    path('archive/', views.archive, name='archive'),
+    path('news/', views.news, name='news'),
+    path('important-news/', views.news, name='important_news'),
+    path('users/', views.users_page, name='users'),
+    path('messages/', views.messages_page, name='messages'),
+    path('notifications/', views.notifications_page, name='notifications'),
+    path('ai/', views.ai_page, name='ai'),
+    path('office/', views.office, name='office'),
+    path('audit/', views.audit_page, name='audit'),
+    path('settings/', views.settings_page, name='settings'),
+    path('attachment/<int:pk>/download/', views.attachment_download, name='attachment_download'),
+    path('message/<int:pk>/voice/', views.message_voice, name='message_voice'),
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

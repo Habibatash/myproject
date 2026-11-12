@@ -1,0 +1,56 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ request.user.preferred_language|default:'ps' }}" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17344f"><title>{% block title %}{{ site_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'core/app.css' %}">
+  <script>window.AGENCY_LANGUAGE = "{{ request.user.preferred_language|default:'ps' }}";</script>
+  <script src="{% static 'core/i18n.js' %}" defer></script>
+</head>
+<body>
+{% if request.user.is_authenticated %}
+<div class="layout">
+  <div class="mobile-shade" id="mobileShade" onclick="toggleSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-logo">ا</div><div><b data-i18n="brand_title">{{ site_name }}</b><small data-i18n="brand_sub">د اسنادو او راپورونو مدیریت</small></div></div>
+    <div class="nav-caption" data-i18n="navlbl_main">اصلي مېنو</div>
+    <nav class="nav-list">
+      <a href="{% url 'dashboard' %}" class="{% if page == 'dashboard' %}active{% endif %}"><span>▦</span><span data-i18n="nav_dashboard">کورپاڼه</span></a>
+      <a href="{% url 'reports' %}" class="{% if page == 'reports' %}active{% endif %}"><span>▤</span><span data-i18n="nav_reports">راپورونه</span></a>
+      <a href="{% url 'news' %}" class="{% if page == 'news' and news_kind == 'general' %}active{% endif %}"><span>▣</span><span data-i18n="nav_news">عمومي خبرونه</span></a>
+      <a href="{% url 'important_news' %}" class="{% if page == 'news' and news_kind == 'important' %}active{% endif %}"><span>★</span><span data-i18n="nav_publicnews">مهم خبرونه</span></a>
+    </nav>
+    <div class="nav-caption" data-i18n="navlbl_admin">اداري برخې</div>
+    <nav class="nav-list">
+      <a href="{% url 'departments' %}" class="{% if page == 'departments' %}active{% endif %}"><span>▥</span><span data-i18n="nav_departments">امریتونه</span></a>
+      <a href="{% url 'documents' %}" class="{% if page == 'documents' %}active{% endif %}"><span>▧</span><span data-i18n="nav_documents">اسناد او فایلونه</span></a>
+      <a href="{% url 'archive' %}" class="{% if page == 'archive' %}active{% endif %}"><span>▤</span><span data-i18n="nav_archive">آرشیف</span></a>
+    </nav>
+    <div class="nav-caption" data-i18n="navlbl_system">د سیستم اداره</div>
+    <nav class="nav-list">
+      {% if request.user.role == 'gm' %}<a href="{% url 'users' %}" class="{% if page == 'users' %}active{% endif %}"><span>♙</span><span data-i18n="nav_users">کاروونکي</span></a>{% endif %}
+      <a href="{% url 'notifications' %}" class="{% if page == 'notifications' %}active{% endif %}"><span>♧</span><span data-i18n="nav_notifications">خبرتیاوې</span>{% if unread_notifications %}<i class="nav-count">{{ unread_notifications }}</i>{% endif %}</a>
+      <a href="{% url 'messages' %}" class="{% if page == 'messages' %}active{% endif %}"><span>✉</span><span data-i18n="nav_messages">پیغامونه</span></a>
+      <a href="{% url 'ai' %}" class="{% if page == 'ai' %}active{% endif %}"><span>✦</span><span data-i18n="nav_ai">AI</span></a>
+      <a href="{% url 'office' %}" class="{% if page == 'office' %}active{% endif %}"><span>▦</span><span data-i18n="nav_office">د فایلونو جوړول</span></a>
+      {% if request.user.role == 'gm' %}<a href="{% url 'audit' %}" class="{% if page == 'audit' %}active{% endif %}"><span>◷</span><span data-i18n="nav_audit">د فعالیتونو تاریخچه</span></a>{% endif %}
+      <a href="{% url 'settings' %}" class="{% if page == 'settings' %}active{% endif %}"><span>⚙</span><span data-i18n="nav_settings">تنظیمات</span></a>
+    </nav>
+    <div class="sidebar-foot">{{ request.user.display_name }}<br><span>{{ request.user.get_role_display }}{% if request.user.department %} · {{ request.user.department.name }}{% endif %}</span></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-right"><button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button><div><h1>{% block page_title %}{{ site_name }}{% endblock %}</h1><small data-i18n="topsub">د اسنادو او راپورونو مدیریت</small></div></div>
+      <div class="topbar-left"><a class="notification-link" href="{% url 'notifications' %}">♧{% if unread_notifications %}<i>{{ unread_notifications }}</i>{% endif %}</a><div class="profile"><div class="avatar">{{ request.user.display_name|slice:':1' }}</div><div class="profile-text"><b>{{ request.user.display_name }}</b><small>{{ request.user.get_role_display }}</small></div></div><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout-btn" type="submit" data-i18n="logout">وتل</button></form></div>
+    </header>
+    <div class="content">
+      {% if messages %}<div class="flash-stack">{% for m in messages %}<div class="flash {{ m.tags }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+      {% block content %}{% endblock %}
+    </div>
+    <footer>© {{ site_name }} · {{ request.user.get_role_display }}</footer>
+  </main>
+</div>
+{% else %}{% block public_content %}{% endblock %}{% endif %}
+<script src="{% static 'core/app.js' %}"></script>
+</body></html>
