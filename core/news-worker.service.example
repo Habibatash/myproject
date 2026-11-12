@@ -1,0 +1,16 @@
+[Unit]
+Description=Agency Unified System RSS news collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/srv/agency_unified_system
+EnvironmentFile=/srv/agency_unified_system/.env
+ExecStart=/srv/agency_unified_system/.venv/bin/python manage.py fetch_news_loop
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
