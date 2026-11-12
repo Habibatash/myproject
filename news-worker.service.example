@@ -1,0 +1,16 @@
+[Unit]
+Description=Agency external news RSS collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/srv/agency
+EnvironmentFile=/srv/agency/.env
+ExecStart=/srv/agency/venv/bin/python manage.py fetch_news_loop
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

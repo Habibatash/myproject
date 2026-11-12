@@ -1,0 +1,64 @@
+
+# ===== AGENCY UPGRADE: strict role-based server permissions =====
+from django.conf import settings as _agency_settings
+from django.db.models import Q as _AgencyQ
+from .models import User as _AgencyUser, ROLE_GM as _AGENCY_GM, ROLE_AMIR as _AGENCY_AMIR
+from .models import ROLE_EMPLOYEE as _AGENCY_EMPLOYEE, ROLE_DEPUTY as _AGENCY_DEPUTY
+
+
+def active_users():
+    qs = _AgencyUser.objects.filter(is_active=True, approved=True)
+    if getattr(_agency_settings, "EMAIL_VERIFICATION_REQUIRED", True):
+        qs = qs.filter(email_verified=True)
+    return qs
+
+
+def general_managers():
+    return active_users().filter(role=_AGENCY_GM)
+
+
+def gm_count():
+    return general_managers().count()
+
+
+def can_manage(me, owner):
+    if not getattr(me, "is_authenticated", False):
+        return False
+    if me.role == _AGENCY_GM:
+        return True
+    if owner is None:
+        return False
+    if owner.pk == me.pk:
+        return True
+    if me.role == _AGENCY_AMIR:
+        return bool(me.department_id and owner.department_id == me.department_id and owner.role in (_AGENCY_EMPLOYEE, _AGENCY_DEPUTY))
+    return False
+
+
+def visible_documents(me):
+    from .models import Document
+    qs = Document.objects.all()
+    if not getattr(me, "is_authenticated", False):
+        return qs.none()
+    if me.role == _AGENCY_GM:
+        return qs
+    if me.role == _AGENCY_AMIR and me.department_id:
+        return qs.filter(_AgencyQ(owner=me) | _AgencyQ(owner__department_id=me.department_id, owner__role__in=(_AGENCY_EMPLOYEE, _AGENCY_DEPUTY)))
+    return qs.filter(owner=me)
+
+
+def amirs_of(owner):
+    if not owner or not owner.department_id:
+        return _AgencyUser.objects.none()
+    return active_users().filter(role=_AGENCY_AMIR, department_id=owner.department_id)
+
+
+def alert_recipients(me):
+    if me.role == _AGENCY_GM:
+        return active_users().exclude(pk=me.pk)
+    if me.role == _AGENCY_AMIR and me.department_id:
+        return active_users().filter(role__in=(_AGENCY_EMPLOYEE, _AGENCY_DEPUTY), department_id=me.department_id)
+    return _AgencyUser.objects.none()
+
+# Preserve the role tuple used by existing views.
+EMPLOYEE_ROLES = (_AGENCY_EMPLOYEE, _AGENCY_DEPUTY)

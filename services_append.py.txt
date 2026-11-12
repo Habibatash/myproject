@@ -1,0 +1,18 @@
+
+# ===== AGENCY UPGRADE: @mention lookup across all authorized active users =====
+import re as _agency_re
+
+
+def find_mentions(text, users):
+    """Return users mentioned as @Full_Name; spaces may be written as underscores."""
+    text = str(text or "")
+    found = []
+    for user in users:
+        name = (getattr(user, "name", "") or "").strip()
+        if not name:
+            continue
+        token = _agency_re.escape(name).replace(r"\ ", r"[\s_]+")
+        pattern = _agency_re.compile(r"(?<![\w])@" + token + r"(?![\w])", _agency_re.IGNORECASE)
+        if pattern.search(text):
+            found.append(user)
+    return found
