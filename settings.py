@@ -64,7 +64,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 LANGUAGE_CODE = 'ps'
-LANGUAGES = [('ps', 'پښتو'), ('fa', 'دری / فارسی'), ('ar', 'العربية'), ('en', 'English')]
+LANGUAGES = [('fa', 'پښتو'), ('fa', 'دری / فارسی'), ('ar', 'العربية'), ('en', 'English')]
 TIME_ZONE = os.getenv('TIME_ZONE', 'Asia/Kabul')
 USE_I18N = True
 USE_TZ = True
