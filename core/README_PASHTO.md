@@ -1,117 +1,142 @@
-# د ادارې متحد سیستم — Django نسخه
+# د ادارې متحد سیستم — د Django اصلاحاتي بسته
 
-دا بسته د پخواني `د ادارې متحد سیستم (3).html` نمونې پر بنسټ د Django بشپړه پروژه جوړوي. پخوانۍ HTML نسخه په `reference/` کې د ډیزاین د مرجع په توګه ساتل شوې ده؛ د هغې د `localStorage` ډیمو پر ځای اوس معلومات په سرور ډیټابېس کې ثبتېږي.
+دا بسته ستا د ورکړل شوي HTML ډیزاین ساتي او د موجود Django `agency` او `core` پروژې لپاره لاندې شاتني بدلونونه ورزیاتوي.
 
-## څه پکې شته؟
+## څه پکې اصلاح شوي؟
 
-- د ننوتلو او نوي حساب ثبت؛ نوي حسابونه د عمومي مدیر تر تایید مخکې فعال نه وي.
-- څلور رولونه: عمومي مدیر، مرستیال، د امریت مدیر، کارکوونکی.
-- پنځه امریتونه چې د اصلي نمونې له مخې Seed کېږي.
-- اسناد او راپورونه: ورځنی، اونیز، میاشتنی، شپږمیاشتنی، کلنی او بې‌مودې اسناد؛ ضمیمې، د کتنې حالت، آرشیف او لټون.
-- د عمومي او مهمو خبرونو خپرول، ضمیمې، خوښې، نظرونه او `@mention` خبرتیاوې.
-- لیکلي او غږیز پیغامونه: عمومي مدیر ټولو ته یا یو کاروونکي ته؛ د امریت مدیر خپل امریت ته یا د خپل امریت یو کارکوونکي/مرستیال ته. مرستیال او کارکوونکی پیغام نه شي لېږلای؛ لېږونکی او عمومي مدیر د پیغام د حذف اجازه لري.
-- خبرتیاوې، د فعالیتونو تاریخچه، د کاروونکو مدیریت او د رولونو بدلول.
-- AI د پوښتنو لپاره: یوازې د کاروونکي د صلاحیت له مخې د لیدلو وړ اسناد او خبرونه تحلیلوي. د Anthropic API کیلي یوازې د سرور په `.env` کې ساتل کېږي. که کیلي نه وي، یوازې احصایوي محلي لنډیز ښودل کېږي؛ دا د AI بشپړ ځواب نه دی.
-- له HTTPS RSS سرچینو څخه د بهرنیو خبرونو راټولول.
-- د Word او Excel په براوزري کاري پاڼه کې سمون، جدول/فورمولونه، چاپ او محلي ښکته کول؛ همدارنګه له سرور څخه اصلي `.docx` او `.xlsx` جوړول. د سرور DOCX/XLSX صادرات د اوسني متن/حجرو معلومات خوندي کوي، د ټولو ظاهري بڼو او Word انځورونو بشپړ نقل نه دی.
-- د ژبې بنسټیز ملاتړ: پښتو، دري/فارسي، عربي او انګلیسي؛ د وخت سیمه د حساب په تنظیماتو کې ټاکل کېږي. د لمریز/میلادي/قمري تقویم انتخاب خوندي کېږي، خو ټولې نېټې لا په اتومات ډول نه اړوي؛ د رڼا/تیاره موضوع د همدې براوزر په localStorage کې ساتل کېږي. د ژبو ژباړه د انټرفېس په ټولو فرعي برخو کې بشپړه نه ده.
+- د راپورونو لیدل: عمومي مدیر ټول راپورونه ویني؛ امیر د خپل امریت او کارکوونکو راپورونه ویني؛ کارمند یوازې خپل راپورونه ویني.
+- د راپورونو، پوسټونو او تبصرو د اصلاح/حذف اجازه په Django سرور کې تاییدېږي، نه یوازې په HTML کې.
+- د عمومي او مهمو خبرونو پوسټونه ټولو ننوتلو کاروونکو ته ښکاري. د پوسټ په درې‌ټکي مینو کې د کاروونکي د اجازې مطابق اصلاح او حذف راځي.
+- د `@` له لارې د فعالو کاروونکو لټون او منشن؛ د تبصرې د ثبت پر مهال منشن شوي کاروونکي ته د سیستم خبرتیا استول کېږي. د موبایل Push لپاره د VAPID او `services.notify` موجوده تنظیمات باید سم وي. که VAPID کلیدونه نه لرې، لومړی `python manage.py generate_vapid` وچلوه، Django بیاچالان کړه او د خبرتیاوو په برخه کې د موبایل خبرتیاوو تڼۍ کېکاږه.
+- د ثبت پر مهال د ایمیل تایید؛ د تایید لینک بیا لېږلو تڼۍ هم شته. د SMTP له تنظیم پرته لینک یوازې د Django په ټرمینل کې چاپېږي.
+- د AI غوښتنه د براوزر پر ځای د Django سرور ته ځي. API key په براوزر کې نه ساتل کېږي. د AI متن د کاروونکي د لیدلو وړ داخلي خبرونو، راپورونو او د لوستلو وړ ضمیمو څخه جوړېږي؛ د داخلي موادو په منځ کې بهرني خبرونه نه ګډېږي. د هر ډول تر ټولو وروستي ۱۵۰ پوسټونه/اسناد او تر ۶۰ زرو تورو پورې متن د یوې پوښتنې لپاره لېږل کېږي؛ د ډېر لوی آرشیف لپاره باید د موضوع/مودې له مخې جلا پوښتنې وشي.
+- د Excel او Word فایلونه په اصلي `.xlsx` او `.docx` بڼه صادرېږي او د همدې بڼو د پرانیستلو تڼۍ هم لري.
+- د «نور راپورونه» فلټر د امریت په جزئیاتو کې ساتل شوی او له `له راپور سره تړاو نه لري` مودې سره کار کوي.
+- د افغانستان، نړۍ، پاکستان، ایران او امریکا خبرونه له RSS فیډونو راټولېږي او د عاجل، سیاسي، امنیتي، اقتصادي، ټکنالوژۍ، ټولنیز او نورو موضوعاتو له مخې ډلبندي کېږي.
 
-## مهمه خبره: GitHub د Django سرور نه دی
+## مهم محدودیتونه چې باید پوه شې
 
-GitHub د پروژې د کوډ ساتلو او شریکولو ځای دی. یوازې ZIP په GitHub کې پورته کول Django نه چلوي. د پروژې د چلولو لپاره Python سرور/Hosting ته اړتیا ده. ZIP لومړی په کمپیوټر کې Extract کړئ؛ بیا د ZIP دننه فایلونه (د `manage.py` په ګډون) GitHub ته Upload کړئ. د ZIP د فایل په توګه پورته کول د source code د اجرا کولو بدیل نه دی.
+1. **دا د ستا د بشپړې Django پروژې بدیل نه دی.** په دې خبرو کې ستا HTML او د `settings.py`، `views.py`، `ai.py` او `office.py` ځینې کوډونه راکړل شوي وو؛ خو د پروژې بشپړ `models.py`، `permissions.py`، `services.py`، `urls.py`، migrations او requirements نه وو راکړل شوي. نصب‌کوونکی د موجودو فایلونو پر سر اصلاحاتي کوډ ورزیاتوي، خو د هماغې پروژې له بشپړ فایلونو پرته د بې‌خطا چلولو تضمین ممکن نه دی.
+2. د Excel/Word دا موجود ساده ایډیټر د کمپیوټر د Microsoft Office ټول امکانات نه لري. اوسنی صادرول/پرانیستل ریښتیني `.xlsx` او `.docx` جوړوي، خو د څو-پاڼو پیچلي فورمولونه، VBA/Macros، Pivot، Track Changes، SmartArt او د Office ټول پرمختللي امکانات نه رانغاړي. د بشپړ کمپیوټري Office تجربې لپاره باید ONLYOFFICE Docs یا Collabora په سرور کې نصب او ورسره مدغم شي.
+3. د ۲۴ ساعته خبرونو لپاره د RSS سرچینې په ټاکلې وقفه کې لوستل کېږي. ټولنیزې شبکې لکه Facebook، X، Instagram او نور د رسمي API، مجاز ټوکن یا عامه RSS فیډ پرته په خوندي او باوري ډول نه شي لوستل کېدای. بسته د ننوتلو/خصوصي حسابونو scraping نه کوي.
+4. د فایلونو د متن تحلیل د TXT/CSV/JSON/XML/MD، DOCX، XLSX او PDF د لوستلو وړ متن رااخلي. د انځورونو OCR، د ویډیو غږیز transcript او د غږونو transcription پکې نه دي فعال شوي؛ نو AI د دغو فایلونو د محتوا ادعا نه کوي.
+5. د ۲۴ ساعته worker باید تل چالان وساتل شي. یوازې `NEWS_AUTOFETCH=True` کافي نه دی؛ د `fetch_news_loop` پروسه باید د systemd، Supervisor یا Windows Task Scheduler له لارې د سرور له reboot وروسته هم بېرته پورته شي.
 
-## په Windows کې د لومړي ځل چلول
+## د نصبولو طریقه
 
-1. `agency_unified_system.zip` ډاونلوډ او Extract کړئ.
-2. په Extract شوي فولډر کې باید `manage.py`، `config/`، `core/` او `requirements.txt` ښکاره وي.
-3. Python 3.11 یا نوې نسخه نصب کړئ.
-4. په همدې فولډر کې PowerShell/Terminal خلاص کړئ.
-5. دا امرونه په همدې ترتیب اجرا کړئ:
-
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-py -m pip install -r requirements.txt
-Copy-Item .env.example .env
-py manage.py migrate
-py manage.py seed_departments
-py manage.py create_gm
-py manage.py check
-py manage.py runserver
-```
-
-6. براوزر کې `http://127.0.0.1:8000/` خلاص کړئ او د عمومي مدیر ایمیل/پټنوم وکاروئ چې د `create_gm` امر پر مهال مو جوړ کړی و.
-7. که PowerShell د Activate script اجازه نه ورکوي، د همدې Terminal لپاره دا امر یو ځل اجرا کړئ او بیا Activate وکړئ:
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\Activate.ps1
-```
-
-په Windows کې د لنډې لارې لپاره `run_local.bat` هم شته؛ لومړی مدیر بیا په جلا ډول د `py manage.py create_gm` په امر جوړ کړئ.
-
-## په Linux سرور کې چلول
+1. د پروژې له اصلي فولډر څخه backup واخله. په هماغه فولډر کې باید `manage.py`، `core/` او د Django تنظیماتو فولډر (اکثر `agency/`) موجود وي.
+2. د `install_django_upgrade.py` فایل د پروژې اصلي فولډر ته کاپي کړه.
+3. په CMD/PowerShell/Terminal کې د پروژې اصلي فولډر ته لاړ شه او دا چلوه:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-# .env کې SECRET_KEY، DEBUG=False، ALLOWED_HOSTS او DATABASE_URL تنظیم کړئ
+python install_django_upgrade.py
+```
+
+یا که پروژه بل ځای وي:
+
+```bash
+python install_django_upgrade.py --project-root "C:\path\to\your\django-project"
+```
+
+نصب‌کوونکی د بدلولو مخکې د فایلونو backup په `_agency_upgrade_backups/` کې ساتي، نوي فایلونه ځای پر ځای کوي او هڅه کوي migrations، migrate او `manage.py check` وچلوي. که اتومات migration ناکامه شي، لاندې لاس‌لارې امرونه په خپله اجرا کړه:
+
+```bash
+python manage.py makemigrations core
 python manage.py migrate
-python manage.py seed_departments
-python manage.py create_gm
-python manage.py collectstatic --noinput
-python manage.py check --deploy
-gunicorn config.wsgi:application --bind 0.0.0.0:8000
-```
-
-د تولید لپاره PostgreSQL وکاروئ او `DATABASE_URL` ورته برابر کړئ. SQLite یوازې د ازموینې/کوچني محلي کار لپاره دی. د رسنیو او ضمیمو لپاره د سرور دایمي disk/object storage هم تنظیم کړئ؛ که Hosting موقتي filesystem ولري، اپلوډ شوي فایلونه د بیا Deploy پر مهال له منځه تلای شي.
-
-## GitHub ته د پورته کولو طریقه
-
-1. ZIP Extract کړئ.
-2. په GitHub کې خپل `myproject` Repository خلاص کړئ.
-3. `Add file` → `Upload files` وټاکئ.
-4. د ZIP دننه ټول فایلونه او فولډرونه انتخاب کړئ؛ **`manage.py` باید د Repository په root کې وي**، نه په بل nested فولډر کې.
-5. `.env`، `db.sqlite3`، `.venv/` او `media/` هېڅکله GitHub ته مه پورته کوئ.
-6. `Commit changes` وکړئ. په دې بسته کې د `.github/workflows/django-checks.yml` فایل شته؛ GitHub به د هر Push یا Pull Request پر مهال migrations، Django checks او tests وچلوي، خو دا workflow ویب‌سایټ نه خپروي.
-7. د کوډ د چلولو لپاره Repository له Python Hosting/VPS سره وصل کړئ. د Hosting په Environment Variables کې د `.env` ارزښتونه ثبت کړئ.
-
-## د لومړي عمومي مدیر حساب
-
-هیڅ ډیمو ایمیل، عمومي پټنوم یا پټ Administrator حساب پکې نشته. لومړی مدیر په سرور کې داسې جوړېږي:
-
-```bash
-python manage.py create_gm
-```
-
-امر ایمیل، نوم او قوي پټنوم غواړي. د حساب د جوړېدو وروسته د کاروونکو برخه کې نور حسابونه او رولونه اداره کېدای شي.
-
-## ایمیل تایید
-
-په `.env` کې `EMAIL_VERIFICATION_REQUIRED=True` یوازې هغه وخت کړئ چې SMTP مو سم تنظیم کړی وي. د محلي ازموینې default ایمیل backend د تایید لینک د سرور په console/log کې چاپوي. که د ایمیل تایید بند وي، بیا هم نوی حساب د عمومي مدیر تر تایید مخکې ننوتلای نه شي.
-
-## AI او RSS خبرونه
-
-- AI: `ANTHROPIC_API_KEY` او د خپل Anthropic حساب له خوا منل شوی `AI_MODEL` په `.env` کې تنظیم کړئ. د اوسني تنظیم اصلي ماډل `claude-sonnet-5-5` دی؛ که ستاسې API حساب بل ماډل ته لاسرسی لري، ارزښت بدلولای شئ. کیلي په GitHub، HTML یا browser کې مه لیکئ.
-- RSS: د `.env` په `NEWS_FEEDS_JSON` کې د HTTPS سرچینو JSON لېست واچوئ، بیا `python manage.py fetch_news_once` اجرا کړئ.
-- تکراري راټولول: `python manage.py fetch_news_loop` په جلا terminal یا د systemd د `news-worker.service.example` په څېر جلا service کې وچلوئ. دا امر دوامداره چلېږي، نو د ویب سرور په هماغه terminal کې یې مه چلوئ.
-
-## ازموینه او ساتنه
-
-```bash
-python manage.py test
 python manage.py check
-python manage.py check --deploy
 ```
 
-- د هر Deploy مخکې د ډیټابېس backup واخلئ.
-- د فایلونو اعظمي upload اندازه ۲۰ MB ده؛ د فایلونو اجازه لرونکي extensionونه محدود شوي دي.
-- د اسنادو ضمیمې یوازې د سند د لیدلو مجاز کاروونکي ترلاسه کولای شي.
-- عمومي مدیر ټول اسناد ویني او اداره کوي؛ د امریت مدیر خپل اسناد او د خپل امریت د کارکوونکو/مرستیالانو اسناد ویني او اداره کوي؛ مرستیال او کارکوونکی یوازې خپل اسناد ویني او اداره کوي.
-- د فعالیتونو تاریخچه د عادي UI له لارې نه شي حذف کېدای؛ د Django admin کې هم د هغې د Add/Change/Delete اجازه بنده ده.
+## اړین Python کڅوړې
 
-## د تطبیق حدود
+د پروژې د requirements مطابق Django باید له مخکې نصب وي. د Word/Excel او PDF د AI لوستلو لپاره:
 
-دا پروژه د پخوانۍ HTML نمونې اصلي برخې د Django په server-backed ډول پلي کوي، خو دا د بهرني سرور/Database/SMTP/Anthropic/RSS خدمتونو د credentials پر ځای نه ده. د دې جوړولو چاپېریال کې Django نصب نه و او د انټرنېټ له لارې dependency نصب ممکن نه و؛ له همدې امله په دې ځای کې `manage.py check` او د Django integration tests نه شول اجرا کېدای. د Python syntax، JavaScript syntax، د اړینو فایلونو موجودیت او ZIP integrity وارزول شول. په خپل کمپیوټر یا سرور کې د `pip install` وروسته د پورته ازموینو اجرا ضروري ده.
+```bash
+pip install python-docx openpyxl pypdf pywebpush cryptography
+```
+
+که د Push لپاره `pywebpush` او `cryptography` لا نه وي نصب:
+
+```bash
+pip install pywebpush cryptography
+```
+
+## اړین چاپېریالي متغیرونه
+
+دا ارزښتونه د سرور Environment Variables کې تنظیم کړه؛ په Python فایلونو او HTML کې پټنومونه مه لیکه.
+
+```text
+DJANGO_SECRET_KEY=ستاسې-اوږده-تصادفي-پټه-کیلي
+DJANGO_DEBUG=0
+DJANGO_ALLOWED_HOSTS=your-domain.com,www.your-domain.com
+DJANGO_HTTPS=1
+DJANGO_CSRF_TRUSTED_ORIGINS=https://your-domain.com
+SITE_URL=https://your-domain.com
+
+EMAIL_HOST=smtp.your-provider.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=no-reply@your-domain.com
+EMAIL_HOST_PASSWORD=د-ایمیل-اپ-پټنوم
+EMAIL_USE_TLS=1
+EMAIL_USE_SSL=0
+DEFAULT_FROM_EMAIL=no-reply@your-domain.com
+EMAIL_VERIFICATION_REQUIRED=1
+
+ANTHROPIC_API_KEY=ستاسې-Anthropic-API-key
+AI_MODEL=claude-sonnet-5
+
+NEWS_AUTOFETCH=1
+NEWS_FETCH_INTERVAL_MIN=15
+NEWS_KEEP_DAYS=14
+```
+
+- که SMTP تنظیم نه وي، `EMAIL_BACKEND` به کنسولي وي او د تایید لینک به د Django د سرور په ټرمینل کې ښکاري. دا په production کې د ایمیل لېږلو بدیل نه دی.
+- د `DJANGO_DEBUG=0`، د خپل اصلي host، HTTPS، CSRF trusted origin او یو ثابت `DJANGO_SECRET_KEY` تنظیمول په production کې ضروري دي.
+- د `NEWS_FEEDS_JSON` له لارې خپل RSS فیډونه هم ورزیاتولای شې. بڼه یې د JSON لېست دی:
+
+```json
+[
+  {"country":"afghanistan","source":"زما سرچینه","url":"https://example.com/rss.xml","language":"ps"},
+  {"country":"world","source":"بله سرچینه","url":"https://example.org/feed","language":"en"}
+]
+```
+
+که دا متغیر تش پرېښودل شي، په بسته کې ټاکل شوې عامه سرچینې کارول کېږي. د RSS فیډونو شتون، جوړښت او د لاسرسي اجازه د سرچینې له خوا بدلېدای شي؛ که کوم فیډ کار ونه کړي، worker یې په log کې د خطا په توګه ثبتوي او نور فیډونه لوستلو ته دوام ورکوي.
+
+## د موبایل Push خبرتیاوو لپاره (یو ځل):
+
+```bash
+python manage.py generate_vapid
+```
+
+دا امر `vapid_private.pem` او `vapid_public.txt` جوړوي. خصوصي کلید هېڅکله چا ته مه لېږه. د Django سرور له بیاچالانولو وروسته د خبرتیاوو له پاڼې څخه «په موبایل کې خبرتیاوې فعالول» کېکاږه.
+
+## د سرور چلول
+
+د Django وېب سرور:
+
+```bash
+python manage.py runserver
+```
+
+د خبرونو یو ځل راوړل او ازموینه:
+
+```bash
+python manage.py fetch_news_once
+```
+
+د خبرونو دوامداره ۲۴ ساعته راټولول (په جلا Terminal کې):
+
+```bash
+python manage.py fetch_news_loop
+```
+
+د production لپاره دا وروستۍ پروسه د systemd/Supervisor/Windows Task Scheduler له لارې د اتومات بیاچالانېدو سره تنظیم کړه. یوازې Terminal وتړل شي، worker هم بندېږي.
+
+## د نصب وروسته ازموینې
+
+- د کارمند له حسابه د بل امیر راپور باید په `reports`، `documents` او `departments` کې ښکاره نه شي.
+- د امیر له حسابه د بل امریت راپور باید ښکاره نه شي، خو د خپل امریت د کارمندانو راپورونه باید ښکاره شي.
+- د عمومي مدیر له حسابه ټول راپورونه ښکاره شي.
+- په عمومي او مهمو خبرونو کې د ټولو مجازو پوسټونو لیدل، منشن، تبصره، اصلاح او حذف د نقش مطابق وازمویه.
+- د ثبت وروسته ایمیل او تایید لینک، د AI پوښتنه، `.xlsx` او `.docx` صادرات/واردات او د خبرونو RSS worker په جلا جلا ډول وازمویه.
+- په دوه جلا براوزر/حسابونو کې هم د لاسرسي ازموینه وکړه؛ یوازې د مدیر د حساب څخه کتل بسنه نه کوي.
