@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}
+{% block title %}ننوتل | د ادارې متحد سیستم{% endblock %}
+{% block public_content %}
+<div class="auth-shell"><div class="auth-card"><div class="brand auth-brand"><div class="brand-logo">ا</div><div><b>د ادارې متحد سیستم</b><small>د اسنادو او راپورونو مدیریت</small></div></div><h1>سیستم ته ننوتل</h1><p class="muted">د خپل تایید شوي حساب ایمیل او پټنوم ولیکئ.</p>
+{% if messages %}{% for m in messages %}<div class="flash {{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+<form method="post">{% csrf_token %}<label>ایمیل</label><input name="username" type="email" autocomplete="username" required placeholder="name@example.com"><label>پټنوم</label><input name="password" type="password" autocomplete="current-password" required><button class="btn primary full" type="submit">ننوتل</button></form>
+<p class="auth-foot">حساب نه لرئ؟ <a href="{% url 'register' %}">نوی حساب جوړ کړئ</a></p><p class="tiny muted">لومړی عمومي مدیر باید د سرور له لارې جوړ شي: <code>python manage.py create_gm</code></p></div></div>
+{% endblock %}
