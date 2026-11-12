@@ -1,8 +1,15 @@
 {% extends 'core/base.html' %}
-{% block title %}ننوتل | د ادارې متحد سیستم{% endblock %}
+{% block title %}ننوتل | {{ site_name }}{% endblock %}
 {% block public_content %}
-<div class="auth-shell"><div class="auth-card"><div class="brand auth-brand"><div class="brand-logo">ا</div><div><b>د ادارې متحد سیستم</b><small>د اسنادو او راپورونو مدیریت</small></div></div><h1>سیستم ته ننوتل</h1><p class="muted">د خپل تایید شوي حساب ایمیل او پټنوم ولیکئ.</p>
-{% if messages %}{% for m in messages %}<div class="flash {{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
-<form method="post">{% csrf_token %}<label>ایمیل</label><input name="username" type="email" autocomplete="username" required placeholder="name@example.com"><label>پټنوم</label><input name="password" type="password" autocomplete="current-password" required><button class="btn primary full" type="submit">ننوتل</button></form>
-<p class="auth-foot">حساب نه لرئ؟ <a href="{% url 'register' %}">نوی حساب جوړ کړئ</a></p><p class="tiny muted">لومړی عمومي مدیر باید د سرور له لارې جوړ شي: <code>python manage.py create_gm</code></p></div></div>
+<div class="gate"><div class="gate-card">
+  <div class="gate-brand"><div class="brand-logo">ا</div><div><b>{{ site_name }}</b><small>د اسنادو او راپورونو مدیریت</small></div></div>
+  <h3>سیستم ته ننوتل</h3>
+  {% if messages %}{% for m in messages %}<div class="flash {{ m.tags }}">{{ m }}</div>{% endfor %}{% endif %}
+  <form method="post">{% csrf_token %}
+    <div class="form-group"><label for="id_username">ایمیل</label><input id="id_username" name="username" type="email" autocomplete="username" required autofocus></div>
+    <div class="form-group"><label for="id_password">پټنوم</label><input id="id_password" name="password" type="password" autocomplete="current-password" required></div>
+    <div class="modal-actions"><button class="btn gold" type="submit">ننوتل</button><a class="btn light" href="{% url 'register' %}">نوی حساب جوړول</a></div>
+  </form>
+  {% if unverified_email %}<form method="post" action="{% url 'resend_verification' %}" class="resend-form">{% csrf_token %}<input type="hidden" name="email" value="{{ unverified_email }}"><button class="btn light" type="submit">✉ د تایید لینک بیا ولېږه</button></form>{% endif %}
+</div></div>
 {% endblock %}

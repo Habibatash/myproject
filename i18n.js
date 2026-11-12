@@ -9,6 +9,7 @@ nav_dashboard:["کورپاڼه","صفحهٔ اصلی","الرئيسية","Dashbo
 nav_reports:["راپورونه","گزارش‌ها","التقارير","Reports"],
 nav_news:["عمومي خبرونه","خبرهای عمومی","الأخبار العامة","General news"],
 nav_publicnews:["مهم خبرونه","خبرهای مهم","الأخبار المهمة","Important news"],
+nav_worldnews:["د افغانستان او نړۍ خبرونه","اخبار افغانستان و جهان","أخبار أفغانستان والعالم","Afghanistan & world news"],
 nav_departments:["امریتونه","آمریت‌ها","الإدارات","Departments"],
 nav_documents:["اسناد او فایلونه","اسناد و فایل‌ها","المستندات والملفات","Documents & files"],
 nav_archive:["آرشیف","آرشیف","الأرشيف","Archive"],

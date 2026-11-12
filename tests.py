@@ -42,3 +42,56 @@ class DepartmentPermissionTests(TestCase):
         request.user = self.employee
         with self.assertRaises(PermissionDenied):
             _department_for_user(request, self.b.pk)
+
+
+
+class AccessAndMentionTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from .models import Post, Comment
+        cls.a = Department.objects.create(slug='a2', name='الف')
+        cls.b = Department.objects.create(slug='b2', name='ب')
+        mk = lambda n, role, dept: User.objects.create_user(username=f'{n}@x.com', email=f'{n}@x.com', password='StrongPass!123', first_name=n, role=role, department=dept, approved=True, is_active=True, email_verified=True)
+        cls.gm = mk('gm', 'gm', None)
+        cls.amir_a = mk('amira', 'amir', cls.a)
+        cls.amir_b = mk('amirb', 'amir', cls.b)
+        cls.emp_a = mk('empa', 'employee', cls.a)
+        cls.emp_b = mk('empb', 'employee', cls.b)
+        cls.post_a = Post.objects.create(author=cls.emp_a, department=cls.a, text='x')
+        cls.post_b = Post.objects.create(author=cls.emp_b, department=cls.b, text='y')
+
+    def test_edit_delete_scope_for_posts(self):
+        from .permissions import can_edit_post
+        self.assertTrue(can_edit_post(self.gm, self.post_a) and can_edit_post(self.gm, self.post_b))
+        self.assertTrue(can_edit_post(self.amir_a, self.post_a))
+        self.assertFalse(can_edit_post(self.amir_a, self.post_b))
+        self.assertTrue(can_edit_post(self.emp_a, self.post_a))
+        self.assertFalse(can_edit_post(self.emp_a, self.post_b))
+
+    def test_reports_are_not_visible_across_amirs_or_employees(self):
+        d = Document.objects.create(title='d', department=self.b, created_by=self.amir_b)
+        self.assertNotIn(d, visible_documents(self.amir_a))
+        self.assertNotIn(d, visible_documents(self.emp_a))
+        self.assertIn(d, visible_documents(self.gm))
+
+    def test_employee_cannot_open_departments_page(self):
+        self.client.force_login(self.emp_a)
+        self.assertEqual(self.client.get('/departments/').status_code, 302)
+        self.client.force_login(self.gm)
+        self.assertEqual(self.client.get('/departments/').status_code, 200)
+
+    def test_mention_list_contains_every_other_user_and_notifies(self):
+        from .models import Notification
+        from .services import notify_mentions
+        self.client.force_login(self.emp_a)
+        names = {u['name'] for u in self.client.get('/api/mention-users/').json()['users']}
+        self.assertEqual(names, {'gm', 'amira', 'amirb', 'empb'})
+        notify_mentions('hi', self.emp_a, '/news/', ids=[self.amir_b.pk])
+        self.assertTrue(Notification.objects.filter(recipient=self.amir_b).exists())
+
+    def test_login_requires_verified_email(self):
+        u = User.objects.create_user(username='n@x.com', email='n@x.com', password='StrongPass!123', approved=True, is_active=True, email_verified=False)
+        with self.settings(EMAIL_VERIFICATION_REQUIRED=True):
+            r = self.client.post('/accounts/login/', {'username': 'n@x.com', 'password': 'StrongPass!123'})
+        self.assertEqual(r.status_code, 200)
+        self.assertNotIn('_auth_user_id', self.client.session)

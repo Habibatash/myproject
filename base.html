@@ -20,10 +20,11 @@
       <a href="{% url 'reports' %}" class="{% if page == 'reports' %}active{% endif %}"><span>▤</span><span data-i18n="nav_reports">راپورونه</span></a>
       <a href="{% url 'news' %}" class="{% if page == 'news' and news_kind == 'general' %}active{% endif %}"><span>▣</span><span data-i18n="nav_news">عمومي خبرونه</span></a>
       <a href="{% url 'important_news' %}" class="{% if page == 'news' and news_kind == 'important' %}active{% endif %}"><span>★</span><span data-i18n="nav_publicnews">مهم خبرونه</span></a>
+      <a href="{% url 'world_news' %}" class="{% if page == 'world_news' %}active{% endif %}"><span>🌍</span><span data-i18n="nav_worldnews">د افغانستان او نړۍ خبرونه</span></a>
     </nav>
     <div class="nav-caption" data-i18n="navlbl_admin">اداري برخې</div>
     <nav class="nav-list">
-      <a href="{% url 'departments' %}" class="{% if page == 'departments' %}active{% endif %}"><span>▥</span><span data-i18n="nav_departments">امریتونه</span></a>
+      {% if request.user.role == 'gm' or request.user.role == 'amir' %}<a href="{% url 'departments' %}" class="{% if page == 'departments' %}active{% endif %}"><span>▥</span><span data-i18n="nav_departments">امریتونه</span></a>{% endif %}
       <a href="{% url 'documents' %}" class="{% if page == 'documents' %}active{% endif %}"><span>▧</span><span data-i18n="nav_documents">اسناد او فایلونه</span></a>
       <a href="{% url 'archive' %}" class="{% if page == 'archive' %}active{% endif %}"><span>▤</span><span data-i18n="nav_archive">آرشیف</span></a>
     </nav>
@@ -33,7 +34,7 @@
       <a href="{% url 'notifications' %}" class="{% if page == 'notifications' %}active{% endif %}"><span>♧</span><span data-i18n="nav_notifications">خبرتیاوې</span>{% if unread_notifications %}<i class="nav-count">{{ unread_notifications }}</i>{% endif %}</a>
       <a href="{% url 'messages' %}" class="{% if page == 'messages' %}active{% endif %}"><span>✉</span><span data-i18n="nav_messages">پیغامونه</span></a>
       <a href="{% url 'ai' %}" class="{% if page == 'ai' %}active{% endif %}"><span>✦</span><span data-i18n="nav_ai">AI</span></a>
-      <a href="{% url 'office' %}" class="{% if page == 'office' %}active{% endif %}"><span>▦</span><span data-i18n="nav_office">د فایلونو جوړول</span></a>
+      <details class="nav-group" {% if page == 'office' %}open{% endif %}><summary class="{% if page == 'office' %}active{% endif %}"><span>▦</span><span data-i18n="nav_office">Excel / Word</span><i class="chev">▾</i></summary><a class="nav-sub {% if page == 'office' and office_app != 'word' %}active{% endif %}" href="{% url 'office' %}?app=excel"><span>📗</span><span>Excel</span></a><a class="nav-sub {% if page == 'office' and office_app == 'word' %}active{% endif %}" href="{% url 'office' %}?app=word"><span>📘</span><span>Word</span></a></details>
       {% if request.user.role == 'gm' %}<a href="{% url 'audit' %}" class="{% if page == 'audit' %}active{% endif %}"><span>◷</span><span data-i18n="nav_audit">د فعالیتونو تاریخچه</span></a>{% endif %}
       <a href="{% url 'settings' %}" class="{% if page == 'settings' %}active{% endif %}"><span>⚙</span><span data-i18n="nav_settings">تنظیمات</span></a>
     </nav>
@@ -52,5 +53,6 @@
   </main>
 </div>
 {% else %}{% block public_content %}{% endblock %}{% endif %}
+{% if request.user.is_authenticated %}<script>window.AGENCY_POLL_URL="{% url 'notifications_poll' %}";window.AGENCY_MENTION_URL="{% url 'mention_users' %}";window.AGENCY_NOTIF_URL="{% url 'notifications' %}";</script>{% endif %}
 <script src="{% static 'core/app.js' %}"></script>
 </body></html>

@@ -51,7 +51,22 @@ def find_mentions(text):
     return list({u.pk: u for u in found}.values())
 
 
-def notify_mentions(text, actor, target_url=''):
-    for user in find_mentions(text):
+def parse_mention_ids(raw):
+    ids = []
+    for part in (raw or '').split(','):
+        part = part.strip()
+        if part.isdigit():
+            ids.append(int(part))
+    return ids[:50]
+
+
+def notify_mentions(text, actor, target_url='', ids=None, where='نظر'):
+    """Notify every mentioned user: ids chosen from the @ list plus names/emails typed in the text."""
+    targets = {u.pk: u for u in find_mentions(text)}
+    for u in User.objects.filter(pk__in=parse_mention_ids(','.join(map(str, ids or []))), is_active=True, approved=True):
+        targets[u.pk] = u
+    for user in targets.values():
         if user.pk != actor.pk:
-            notify(user, 'تاسې په یوه پیغام کې یاد شوي یاست', f'{actor.display_name}: {(text or "")[:180]}', target_url, actor)
+            notify(user, f'{actor.display_name} تاسې په یوه {where} کې یاد کړئ',
+                   (text or '')[:250], target_url, actor)
+    return list(targets.values())
