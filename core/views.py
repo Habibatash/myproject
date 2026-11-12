@@ -27,12 +27,46 @@ from django.views.decorators.http import require_POST
 from .models import (Attachment, AuditEvent, Comment, Department, Document, ExternalNews,
                      Message, Notification, Post, SystemSetting, User)
 from .permissions import (can_delete_comment, can_edit_document, can_edit_post, can_manage_users,
-                         can_send_messages, is_gm, visible_documents, visible_messages)
+                         can_send_messages, can_view_document, is_gm, visible_documents, visible_messages)
 from .newsfeeds import refresh_in_background
 from .services import audit, notify, notify_many, notify_mentions, parse_mention_ids
 
 ALLOWED_UPLOAD_SIZE = 20 * 1024 * 1024
 ALLOWED_UPLOAD_EXTS = {'.pdf','.doc','.docx','.xls','.xlsx','.csv','.txt','.png','.jpg','.jpeg','.gif','.webp','.mp4','.mov','.mp3','.wav','.ogg','.webm','.m4a'}
+
+
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        password = request.POST.get('password', '')
+        department_id = request.POST.get('department') or None
+
+        if not email or not first_name or not password:
+            messages.error(request, 'نوم، ایمیل او پټنوم حتمي دي.')
+        elif User.objects.filter(email__iexact=email).exists():
+            messages.error(request, 'دا ایمیل مخکې ثبت شوی دی.')
+        elif len(password) < 10:
+            messages.error(request, 'پټنوم باید لږ تر لږه ۱۰ توري ولري.')
+        else:
+            dept = Department.objects.filter(pk=department_id, is_active=True).first() if department_id else None
+            candidate = User(username=email, email=email, first_name=first_name, last_name=last_name)
+            try:
+                validate_password(password, candidate)
+                u = User.objects.create_user(
+                    username=email, email=email, first_name=first_name, last_name=last_name,
+                    role=User.Roles.EMPLOYEE, department=dept, approved=False, email_verified=False, is_active=False
+                )
+                u.set_password(password)
+                u.save()
+                messages.success(request, 'ستاسې حساب جوړ شو؛ د عمومي مدیر تر تایید وروسته به فعال شي.')
+                return redirect('login')
+            except ValidationError as exc:
+                messages.error(request, '؛ '.join(exc.messages))
+    return render(request, 'register.html', {'departments': Department.objects.filter(is_active=True)})
 
 
 def _upload_files(request, *, document=None, post=None):
@@ -62,7 +96,7 @@ def _department_for_user(request, submitted_id):
 
 def _page(request, page, **context):
     context.update({'page': page, 'current_role': request.user.role, 'departments': Department.objects.filter(is_active=True), 'document_owners': User.objects.filter(is_active=True, approved=True).exclude(role=User.Roles.GM).order_by('first_name') if is_gm(request.user) and page == 'documents' else [], 'period_choices': Document.Period.choices, 'period_filter_choices': [c for c in Document.Period.choices if c[0] != Document.Period.NONE], 'role_choices': User.Roles.choices, 'now': timezone.localtime()})
-    return render(request, 'core/workspace.html', context)
+    return render(request, 'workspace.html', context)
 
 
 def _base_docs(request):
